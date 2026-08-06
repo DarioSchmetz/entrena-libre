@@ -73,15 +73,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Inicio de Sesión con Google
-        if (targetId === 'btn-google-login') {
-            const { error } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: { redirectTo: 'https://darioschmetz.github.io/entrena-libre/' }
-            });
-            if (error) alert('Error al iniciar con Google: ' + error.message);
-        }
-
+      // Inicio de Sesión con Google
+if (targetId === 'btn-google-login') {
+    const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google'
+    });
+    if (error) alert('Error al iniciar con Google: ' + error.message);
+}
         // Guardar Perfil Físico
         if (targetId === 'btn-guardar-perfil') {
             const perfil = {
