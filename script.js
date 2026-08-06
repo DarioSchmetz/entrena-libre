@@ -1,130 +1,143 @@
-// Base de datos de ejercicios (Versión 6 Completa con Estadísticas)
-const ejercicios = [
-    { 
-        nombre: "Sentadillas Isométricas (contra la pared)", 
-        nivel: "principiante", 
-        zona: "piernas", 
-        icono: "🦵", 
-        desc: "3 series de 30 segundos", 
-        detalle: "Fortalece cuádriceps y resistencia de piernas." 
-    },
-    { 
-        nombre: "Plancha abdominal", 
-        nivel: "principiante", 
-        zona: "core", 
-        icono: "🛡️", 
-        desc: "3 series de 30 segundos", 
-        detalle: "Trabaja el abdomen profundo y la estabilidad central." 
-    },
-    { 
-        nombre: "Flexiones de brazos (apoyando rodillas)", 
-        nivel: "principiante", 
-        zona: "brazos", 
-        icono: "💪", 
-        desc: "3 series de 8 a 10 repeticiones", 
-        detalle: "Trabaja pecho, hombros y tríceps con menor impacto." 
-    },
-    { 
-        nombre: "Sentadillas libres", 
-        nivel: "principiante", 
-        zona: "piernas", 
-        icono: "🦵", 
-        desc: "3 series de 12 repeticiones", 
-        detalle: "Trabaja cuádriceps, glúteos y piernas en general." 
-    },
-    { 
-        nombre: "Zancadas o estocadas", 
-        nivel: "intermedio", 
-        zona: "piernas", 
-        icono: "🦵", 
-        desc: "3 series de 10 por pierna", 
-        detalle: "Trabaja piernas, equilibrio y estabilidad de forma unilateral." 
-    },
-    { 
-        nombre: "Plancha lateral", 
-        nivel: "intermedio", 
-        zona: "core", 
-        icono: "🛡️", 
-        desc: "3 series de 20 segundos por lado", 
-        detalle: "Trabaja oblicuos y la estabilidad lateral del core." 
-    },
-    { 
-        nombre: "Flexiones de pecho tradicionales", 
-        nivel: "intermedio", 
-        zona: "brazos", 
-        icono: "💪", 
-        desc: "3 series de 10 repeticiones", 
-        detalle: "Trabaja pecho, tríceps y core por completo." 
-    },
-    { 
-        nombre: "Burpees sin salto", 
-        nivel: "intermedio", 
-        zona: "todas", 
-        icono: "🏃", 
-        desc: "3 series de 8 repeticiones", 
-        detalle: "Ejercicio full body: activa todo el cuerpo y quema calorías." 
-    }
-];
+// ==========================================
+// SCRIPT PRINCIPAL - ENTRENA LIBRE
+// ==========================================
 
-// --- NUEVO: Función para mostrar Estadísticas y Favoritos ---
-function actualizarPanelInformativo() {
-    let seccionInfo = document.getElementById('seccion-info');
-    
-    if (!seccionInfo) {
-        seccionInfo = document.createElement('section');
-        seccionInfo.id = 'seccion-info';
-        seccionInfo.className = 'card';
-        document.querySelector('main').appendChild(seccionInfo);
+// 1. IMPORTACIONES DE MÓDULOS
+import { supabase } from './js/superbase.js';
+import { verificarSesion, renderizarPanelUsuario } from './js/auth.js';
+import { cargarFavoritosNube, borrarRutinaNube } from './js/favoritos.js';
+import { ejercicios, actualizarPanelInformativo, generarPlanSemanal, cargarPlanSemanalGuardado } from './js/rutinas.js';
+
+// 2. INICIALIZACIÓN GENERAL AL CARGAR EL DOM
+document.addEventListener('DOMContentLoaded', () => {
+    verificarSesion();
+    cargarPlanSemanalGuardado();
+
+    // --- LÓGICA DEL MODO OSCURO ---
+    const btnModoOscuro = document.getElementById('btn-modo-oscuro');
+
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        if (btnModoOscuro) btnModoOscuro.textContent = '☀️ Modo Claro';
     }
 
-    const totalGeneradas = localStorage.getItem('totalRutinasGeneradas') || 0;
-    const favoritos = JSON.parse(localStorage.getItem('rutinasFavoritas')) || [];
-
-    let htmlInfo = `
-        <h3 style="color: var(--primary-color);">📊 Panel de Estadísticas</h3>
-        <p style="font-size: 0.95rem; color: #444; margin-bottom: 1rem;">
-            🔥 Rutinas generadas en total: <strong>${totalGeneradas}</strong><br>
-            ⭐ Rutinas guardadas en favoritos: <strong>${favoritos.length}</strong>
-        </p>
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 1rem 0;">
-        <h3 style="color: var(--primary-color);">⭐ Mis Rutinas Favoritas</h3>
-    `;
-
-    if (favoritos.length === 0) {
-        htmlInfo += `<p style="color: #666; font-size: 0.9rem;">No tenés rutinas guardadas todavía. ¡Generá una y guardala!</p>`;
-    } else {
-        favoritos.forEach((rutina, index) => {
-            htmlInfo += `
-                <div style="background: #f9f9f9; padding: 10px; border-radius: 6px; margin-bottom: 10px; text-align: left; border: 1px solid #eee;">
-                    <strong>Rutina #${index + 1}</strong>
-                    <ul style="margin: 5px 0 10px 20px; padding: 0; font-size: 0.9rem;">
-                        ${rutina.map(ej => `<li>${ej.icono} ${ej.nombre} (${ej.desc})</li>`).join('')}
-                    </ul>
-                    <button class="btn btn-eliminar-fav" data-index="${index}" style="background-color: #d32f2f; padding: 0.3rem 0.8rem; font-size: 0.8rem; width: auto;">🗑️ Borrar</button>
-                </div>
-            `;
-        });
-    }
-
-    seccionInfo.innerHTML = htmlInfo;
-
-    // Eventos para borrar favoritos
-    document.querySelectorAll('.btn-eliminar-fav').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const indexToRemove = e.target.getAttribute('data-index');
-            let favs = JSON.parse(localStorage.getItem('rutinasFavoritas')) || [];
-            favs.splice(indexToRemove, 1);
-            localStorage.setItem('rutinasFavoritas', JSON.stringify(favs));
-            actualizarPanelInformativo();
-        });
+    btnModoOscuro?.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        btnModoOscuro.textContent = isDark ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
     });
-}
 
-document.addEventListener('DOMContentLoaded', actualizarPanelInformativo);
+    // --- SINCRONIZACIÓN DE SESIÓN ---
+    document.addEventListener('sesionIniciada', () => {
+        cargarFavoritosNube();
+        actualizarPanelInformativo();
+    });
 
-document.getElementById('btn-generar').addEventListener('click', () => {
+    // --- GESTIÓN CENTRALIZADA DE CLICS (Event Delegation) ---
+    document.addEventListener('click', async (e) => {
+        const targetId = e.target?.id;
+        const targetClass = e.target?.classList;
+
+        // Cerrar Sesión
+        if (targetId === 'btn-logout') {
+            await supabase.auth.signOut();
+            location.reload(); 
+        }
+
+        // Iniciar Sesión con Correo
+        if (targetId === 'btn-login') {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            
+            if (error) {
+                alert('Error al iniciar sesión: ' + error.message);
+            } else {
+                await verificarSesion();
+                cargarFavoritosNube();
+            }
+        }
+
+        // Registro de Usuario
+        if (targetId === 'btn-signup') {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const { error } = await supabase.auth.signUp({ email, password });
+            
+            if (error) {
+                alert('Error al registrarse: ' + error.message);
+            } else {
+                alert('¡Registro exitoso! Ya podés iniciar sesión.');
+            }
+        }
+
+        // Inicio de Sesión con Google
+        if (targetId === 'btn-google-login') {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: { redirectTo: window.location.origin }
+            });
+            if (error) alert('Error al iniciar con Google: ' + error.message);
+        }
+
+        // Guardar Perfil Físico
+        if (targetId === 'btn-guardar-perfil') {
+            const perfil = {
+                nombre: document.getElementById('perfil-nombre')?.value || '',
+                edad: document.getElementById('perfil-edad')?.value || '',
+                peso: document.getElementById('perfil-peso')?.value || '',
+                altura: document.getElementById('perfil-altura')?.value || ''
+            };
+
+            localStorage.setItem('perfilFisicoUser', JSON.stringify(perfil));
+            alert('¡Datos personales guardados con éxito!');
+            
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) renderizarPanelUsuario(session.user.email);
+        }
+
+        // Borrar Historial
+        if (targetId === 'btn-borrar-historial') {
+            localStorage.removeItem('historialEntrenamientos');
+            localStorage.setItem('totalRutinasGeneradas', '0');
+            localStorage.setItem('rutinasCompletadas', '0');
+            actualizarPanelInformativo();
+        }
+
+        // Generar Plan Semanal
+        if (targetId === 'btn-generar-plan') {
+            generarPlanSemanal();
+        }
+
+        // Borrar Rutina de la Nube
+        if (targetClass?.contains('btn-borrar-nube')) {
+            const idRutina = e.target.getAttribute('data-id');
+            await borrarRutinaNube(idRutina);
+        }
+
+        // Marcar Rutina como Completada
+        if (targetId === 'btn-completar-rutina') {
+            let completadas = parseInt(localStorage.getItem('rutinasCompletadas') || 0) + 1;
+            localStorage.setItem('rutinasCompletadas', completadas);
+            actualizarPanelInformativo();
+            alert('¡Felicitaciones! Rutina marcada como realizada.');
+            e.target.disabled = true;
+            e.target.style.background = '#ccc';
+            e.target.textContent = '✅ ¡Realizada!';
+        }
+    });
+});
+
+// 3. LÓGICA DEL GENERADOR DE RUTINAS
+document.getElementById('btn-generar')?.addEventListener('click', () => {
     const nivelSeleccionado = document.getElementById('nivel').value;
     const zonaSeleccionada = document.getElementById('zona').value;
+    const valorDuracion = parseInt(document.getElementById('duracion')?.value) || 3;
+    
+    const textosDuracion = { 2: "15 minutos", 3: "30 minutos", 4: "45 minutos", 5: "60 minutos" };
+    const textoMinutos = textosDuracion[valorDuracion] || "30 minutos";
 
     const ejerciciosFiltrados = ejercicios.filter(ej => {
         const coincideNivel = (nivelSeleccionado === 'todos' || ej.nivel === nivelSeleccionado);
@@ -135,147 +148,64 @@ document.getElementById('btn-generar').addEventListener('click', () => {
     const contenedor = document.getElementById('resultado-rutina');
 
     if (ejerciciosFiltrados.length === 0) {
-        contenedor.innerHTML = `
-            <h3>¡Ups!</h3>
-            <p>No encontramos ejercicios exactos para esa combinación, ¡probá con otra categoría!</p>
-        `;
+        contenedor.innerHTML = `<h3>¡Ups!</h3><p>No encontramos ejercicios para esa combinación.</p>`;
         return;
     }
 
-    // --- Incrementar contador de estadísticas ---
     let totalGeneradas = parseInt(localStorage.getItem('totalRutinasGeneradas') || 0) + 1;
     localStorage.setItem('totalRutinasGeneradas', totalGeneradas);
-    actualizarPanelInformativo(); // Actualiza el panel en vivo
 
-    // --- Evitar repetir ejercicios recientes ---
-    let ultimosEjercicios = JSON.parse(localStorage.getItem('ultimosEjercicios')) || [];
-    let ejerciciosDisponibles = ejerciciosFiltrados.filter(ej => !ultimosEjercicios.includes(ej.nombre));
+    const tomarEjercicios = Math.min(valorDuracion, ejerciciosFiltrados.length);
+    let rutinaAleatoria = [...ejerciciosFiltrados].sort(() => 0.5 - Math.random()).slice(0, tomarEjercicios);
 
-    if (ejerciciosDisponibles.length < 3) {
-        ejerciciosDisponibles = ejerciciosFiltrados;
-    }
+    let historial = JSON.parse(localStorage.getItem('historialEntrenamientos')) || [];
+    historial.unshift({
+        fecha: new Date().toLocaleDateString(),
+        detalles: `${textoMinutos} - ` + rutinaAleatoria.map(e => e.nombre).join(', ')
+    });
+    if (historial.length > 5) historial.pop();
+    localStorage.setItem('historialEntrenamientos', JSON.stringify(historial));
 
-    let rutinaAleatoria = ejerciciosDisponibles.sort(() => 0.5 - Math.random()).slice(0, 3);
-    localStorage.setItem('ultimosEjercicios', JSON.stringify(rutinaAleatoria.map(ej => ej.nombre)));
+    actualizarPanelInformativo();
 
     let htmlRutina = `
-        <h3>🔥 Tu Rutina Personalizada</h3>
-        <p>Realizá estos ejercicios seguidos. ¡Vos podés!</p>
-        <ul class="lista-rutina">
+        <div class="card" style="margin-top: 1rem; border: 2px solid var(--primary);">
+            <h3>🔥 Tu Rutina Personalizada (${textoMinutos})</h3>
+            <ul class="lista-rutina" style="padding-left: 20px;">
     `;
 
     rutinaAleatoria.forEach((ej, index) => {
         htmlRutina += `
-            <li class="item-ejercicio">
+            <li class="item-ejercicio" style="margin-bottom: 8px;">
                 <strong>${ej.icono} Ejercicio ${index + 1}: ${ej.nombre}</strong><br>
-                <span class="detalle-ejercicio">Grupo: ${ej.zona.toUpperCase()} | ${ej.desc}</span><br>
-                <span class="subdetalle-ejercicio">💡 ${ej.detalle}</span>
+                <span class="detalle-ejercicio" style="font-size: 0.85rem; color: var(--text-muted);">Grupo: ${ej.zona.toUpperCase()} | ${ej.desc}</span>
             </li>
         `;
     });
 
-    htmlRutina += `</ul>`;
-    
-    htmlRutina += `
-        <div class="temporizador-box" style="margin-top: 1.5rem; background: #f8f9fa; padding: 1rem; border-radius: 6px; text-align: center; border: 1px solid #ddd;">
-            <h4 style="margin: 0 0 0.5rem 0; color: var(--primary-color);">⏱️ Temporizador de Descanso</h4>
-            <div id="reloj" style="font-size: 2rem; font-weight: bold; color: #333; margin: 0.5rem 0;">00:45</div>
-            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
-                <button class="btn" id="btn-iniciar-timer" style="flex: 1; padding: 0.5rem; background-color: #388e3c; font-size: 0.9rem;">▶️ Iniciar (45s)</button>
-                <button class="btn" id="btn-pausar-timer" style="flex: 1; padding: 0.5rem; background-color: #d32f2f; font-size: 0.9rem;">⏹️ Reiniciar</button>
+    htmlRutina += `</ul>
+            <div style="margin-top: 1rem; display: flex; gap: 8px; flex-wrap: wrap;">
+                <button class="btn" id="btn-guardar-nube" style="flex: 1; font-size: 0.9rem;">☁️ Guardar en la Nube</button>
+                <button class="btn" id="btn-completar-rutina" style="flex: 1; background-color: #2e7d32; font-size: 0.9rem;">✅ Marcar como Realizada</button>
             </div>
-        </div>
-
-        <div style="margin-top: 1rem; display: flex; gap: 8px; flex-wrap: wrap;">
-            <button class="btn" id="btn-copiar" style="flex: 1; background-color: #1976d2; font-size: 0.9rem;">📋 Copiar</button>
-            <button class="btn" id="btn-guardar" style="flex: 1; background-color: #c2185b; font-size: 0.9rem;">❤️ Guardar</button>
-            <button class="btn" id="btn-otra-rutina" style="flex: 1; background-color: var(--primary-color); font-size: 0.9rem;">🔄 Otra</button>
         </div>
     `;
 
     contenedor.innerHTML = htmlRutina;
 
-    // Lógica del Temporizador
-    let tiempoRestante = 45;
-    let intervaloTimer = null;
-    const displayReloj = document.getElementById('reloj');
-    const btnIniciar = document.getElementById('btn-iniciar-timer');
-    const btnPausar = document.getElementById('btn-pausar-timer');
+    document.getElementById('btn-guardar-nube')?.addEventListener('click', async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            alert('Debes iniciar sesión para guardar en la nube.');
+            return;
+        }
 
-    function actualizarReloj() {
-        let minutos = Math.floor(tiempoRestante / 60);
-        let segundos = tiempoRestante % 60;
-        displayReloj.textContent = `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
-    }
-
-    btnIniciar.addEventListener('click', () => {
-        if (intervaloTimer) return;
-        if (tiempoRestante <= 0) tiempoRestante = 45;
-
-        intervaloTimer = setInterval(() => {
-            if (tiempoRestante > 0) {
-                tiempoRestante--;
-                actualizarReloj();
-            } else {
-                clearInterval(intervaloTimer);
-                intervaloTimer = null;
-                alert('¡Tiempo de descanso cumplido! A por el siguiente ejercicio 💪');
-                tiempoRestante = 45;
-                actualizarReloj();
-            }
-        }, 1000);
-    });
-
-    btnPausar.addEventListener('click', () => {
-        clearInterval(intervaloTimer);
-        intervaloTimer = null;
-        tiempoRestante = 45;
-        actualizarReloj();
-    });
-
-    // Guardar en Favoritos
-    document.getElementById('btn-guardar').addEventListener('click', () => {
-        let favoritos = JSON.parse(localStorage.getItem('rutinasFavoritas')) || [];
-        favoritos.push(rutinaAleatoria);
-        localStorage.setItem('rutinasFavoritas', JSON.stringify(favoritos));
-
-        const btnGuardar = document.getElementById('btn-guardar');
-        const textoOriginal = btnGuardar.innerHTML;
-        btnGuardar.innerHTML = '✅ ¡Guardada!';
-        btnGuardar.style.backgroundColor = '#2e7d32';
-
-        setTimeout(() => {
-            btnGuardar.innerHTML = textoOriginal;
-            btnGuardar.style.backgroundColor = '#c2185b';
-        }, 2000);
-
-        actualizarPanelInformativo();
-    });
-
-    // Copiar rutina
-    document.getElementById('btn-copiar').addEventListener('click', () => {
-        const textoRutina = `🔥 Mi Rutina Entrena Libre\n\n` + 
-            rutinaAleatoria.map((ej, i) => `Ejercicio ${i+1}: ${ej.icono} ${ej.nombre} (${ej.zona.toUpperCase()}) - ${ej.desc}\n💡 ${ej.detalle}`).join('\n\n') + 
-            `\n\n¡Vamos con todo!`;
-        
-        navigator.clipboard.writeText(textoRutina).then(() => {
-            const btnCopy = document.getElementById('btn-copiar');
-            const originalText = btnCopy.innerHTML;
-            btnCopy.innerHTML = '✅ ¡Copiada!';
-            btnCopy.style.backgroundColor = '#2e7d32';
-            
-            setTimeout(() => {
-                btnCopy.innerHTML = originalText;
-                btnCopy.style.backgroundColor = '#1976d2';
-            }, 2000);
-        }).catch(err => {
-            console.error('Error al copiar: ', err);
-            alert('Hubo un error al copiar.');
-        });
-    });
-
-    // Generar otra rutina
-    document.getElementById('btn-otra-rutina').addEventListener('click', () => {
-        document.getElementById('btn-generar').click();
+        const { error } = await supabase.from('favorito').insert([{ contenido: rutinaAleatoria }]);
+        if (error) {
+            alert('Error al guardar: ' + error.message);
+        } else {
+            alert('¡Rutina guardada en tu perfil de Supabase con éxito!');
+            cargarFavoritosNube();
+        }
     });
 });

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -8,53 +7,101 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <button class="btn" id="btn-modo-oscuro" 
+    style="position: fixed; top: 20px; right: 20px; z-index: 1000; padding: 8px 12px; font-size: 0.85rem;">
+        🌙 Modo Oscuro</button>
 
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💪 Entrena Libre</title>
-    <link rel="stylesheet" href="style.css">
-</head>
 <main>
+    <!-- Sección de Autenticación / Login -->
+    <section class="card auth-section" id="seccion-auth">
+        <div id="form-auth-container">
+            <h3 class="auth-title">👤 Mi Cuenta - Entrena Libre</h3>
+            <p class="auth-subtitle">Iniciá sesión o registrate para guardar tu historial en la nube.</p>
+            
+            <div class="auth-form-group">
+                <input type="email" id="auth-email" class="form-input" placeholder="Correo electrónico">
+                <input type="password" id="auth-password" class="form-input" placeholder="Contraseña">
+                
+                <div class="auth-buttons-row">
+                    <button class="btn btn-login" id="btn-login">🔑 Ingresar</button>
+                    <button class="btn btn-signup" id="btn-signup">📝 Registrarse</button>
+                </div>
+
+                <div class="auth-divider">
+                    <hr class="divider-line">
+                    <span class="divider-text">o con redes</span>
+                    <hr class="divider-line">
+                </div>
+
+                <button class="btn btn-social btn-google" id="btn-google-login">
+                    <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.19v3.15C3.17 21.36 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.19C.43 8.13 0 9.87 0 11.7s.43 3.57 1.19 5.1l4.08-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.17 2.64 1.19 6.6l4.08 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
+                    Continuar con Google
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contenedor para el perfil de usuario (se muestra al iniciar sesión) -->
+    <div id="user-info-container" style="display: none;" class="card">
+        <h3 class="welcome-title">👋 ¡Bienvenido/a!</h3>
+        <p id="user-email-display" class="user-email-text"></p>
+        <button class="btn btn-logout" id="btn-logout">🚪 Cerrar Sesión</button>
+    </div>
+
+    <!-- Duración de la rutina -->
+    <div class="form-group" style="margin-top: 10px;">
+        <label for="duracion" class="form-label-bold">Duración de la rutina:</label>
+        <select id="duracion" class="form-select">
+            <option value="2">15 minutos (2 ejercicios)</option>
+            <option value="3" selected>30 minutos (3 ejercicios)</option>
+            <option value="4">45 minutos (4 ejercicios)</option>
+            <option value="5">60 minutos (5 ejercicios)</option>
+        </select>
+    </div>
+
+    <!-- Generador de rutinas y filtros -->
     <div class="card">
         <h2>¿Listo para mover el cuerpo hoy?</h2>
         <p>Personalizá tu entrenamiento al instante.</p>
         
-        <div class="form-group" style="margin-bottom: 1rem; text-align: left;">
-            <label for="nivel" style="display:block; font-weight:bold; margin-bottom:0.25rem;">Nivel:</label>
-            <select id="nivel" style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc; margin-bottom: 0.75rem;">
+        <div class="form-group main-filters">
+            <label for="nivel" class="filter-label">Nivel:</label>
+            <select id="nivel" class="form-select filter-select">
                 <option value="todos">Cualquier nivel</option>
                 <option value="principiante">Principiante</option>
                 <option value="intermedio">Intermedio</option>
             </select>
 
-            <label for="zona" style="display:block; font-weight:bold; margin-bottom:0.25rem;">Zona muscular:</label>
-            <select id="zona" style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+            <label for="zona" class="filter-label">Zona muscular:</label>
+            <select id="zona" class="form-select">
                 <option value="todas">Cuerpo completo (Full Body)</option>
                 <option value="piernas">Piernas</option>
                 <option value="core">Core / Abdomen</option>
                 <option value="brazos">Brazos y Pecho</option>
             </select>
         </div>
-
+        
         <button class="btn" id="btn-generar">Buscar Rutina</button>
     </div>
 
+    <!-- Contenedor donde se dibuja la rutina generada -->
     <div id="resultado-rutina"></div>
+
+    <!-- Contenedor de favoritos en la nube -->
+    <div id="favoritos-container"></div>
 
     <div class="card ad-space">
         <p>[ Espacio publicitario web ]</p>
     </div>
 </main>
-  
 
- <footer>
-   <footer>
+<footer>
     <p>&copy; 2026 Entrena Libre. Todos los derechos reservados.</p>
     <p class="footer-legal">Aviso legal: Consulta con un profesional de la salud antes de iniciar cualquier rutina de ejercicios.</p>
 </footer>
-    <!-- Vinculamos el archivo de JavaScript -->
-    <script src="script.js"></script>
+
+<!-- Carga del script principal como módulo de JavaScript -->
+<script type="module" src="./script.js"></script>
 
 </body>
 </html>
