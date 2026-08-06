@@ -11,6 +11,17 @@ document.addEventListener('DOMContentLoaded', () => {
     verificarSesion();
     cargarPlanSemanalGuardado();
 
+    // --- ESCUCHAR CAMBIOS DE SESIÓN (OAuth / Google) ---
+    supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+            renderizarPanelUsuario(session.user.email);
+            cargarFavoritosNube();
+            actualizarPanelInformativo();
+            document.dispatchEvent(new CustomEvent('sesionIniciada', { detail: session }));
+        }
+    });
+
+    // --- LÓGICA DEL MODO OSCURO ---
     const btnModoOscuro = document.getElementById('btn-modo-oscuro');
 
     if (localStorage.getItem('theme') === 'dark') {
@@ -31,15 +42,18 @@ document.addEventListener('DOMContentLoaded', () => {
         actualizarPanelInformativo();
     });
 
+    // --- GESTIÓN CENTRALIZADA DE CLICS ---
     document.addEventListener('click', async (e) => {
         const targetId = e.target?.id;
         const targetClass = e.target?.classList;
 
+        // Cerrar Sesión
         if (targetId === 'btn-logout') {
             await supabase.auth.signOut();
             location.reload(); 
         }
 
+        // Iniciar Sesión con Correo
         if (targetId === 'btn-login') {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
@@ -53,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // Registro de Usuario
         if (targetId === 'btn-signup') {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
@@ -65,13 +80,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // Inicio de Sesión con Google (Independiente y con ruta segura)
         if (targetId === 'btn-google-login') {
             const { error } = await supabase.auth.signInWithOAuth({
-                provider: 'google'
+                provider: 'google',
+                options: {
+                    redirectTo: 'https://darioschmetz.github.io/entrena-libre/'
+                }
             });
-            if (error) alert('Error al iniciar con Google: ' + error.message);
+            if (error) {
+                alert('Error al iniciar con Google: ' + error.message);
+            }
         }
 
+        // Guardar Perfil Físico
         if (targetId === 'btn-guardar-perfil') {
             const perfil = {
                 nombre: document.getElementById('perfil-nombre')?.value || '',
@@ -87,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (session) renderizarPanelUsuario(session.user.email);
         }
 
+        // Borrar Historial
         if (targetId === 'btn-borrar-historial') {
             localStorage.removeItem('historialEntrenamientos');
             localStorage.setItem('totalRutinasGeneradas', '0');
@@ -94,15 +117,18 @@ document.addEventListener('DOMContentLoaded', () => {
             actualizarPanelInformativo();
         }
 
+        // Generar Plan Semanal
         if (targetId === 'btn-generar-plan') {
             generarPlanSemanal();
         }
 
+        // Borrar Rutina de la Nube
         if (targetClass?.contains('btn-borrar-nube')) {
             const idRutina = e.target.getAttribute('data-id');
             await borrarRutinaNube(idRutina);
         }
 
+        // Marcar Rutina como Completada
         if (targetId === 'btn-completar-rutina') {
             let completadas = parseInt(localStorage.getItem('rutinasCompletadas') || 0) + 1;
             localStorage.setItem('rutinasCompletadas', completadas);
@@ -115,6 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// --- LÓGICA DEL GENERADOR DE RUTINAS ---
 document.getElementById('btn-generar')?.addEventListener('click', () => {
     const nivelSeleccionado = document.getElementById('nivel').value;
     const zonaSeleccionada = document.getElementById('zona').value;
