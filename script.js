@@ -72,12 +72,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('¡Registro exitoso! Ya podés iniciar sesión.');
             }
         }
-
-      // Inicio de Sesión con Google
-if (targetId === 'btn-google-login') {
-    const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google'
-    });
+await supabase.auth.signInWithOAuth({
+  provider: 'google',
+  options: {
+    redirectTo: `${window.location.origin}/entrena-libre/`
+  }
+});
     if (error) alert('Error al iniciar con Google: ' + error.message);
 }
         // Guardar Perfil Físico
