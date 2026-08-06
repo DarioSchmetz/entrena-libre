@@ -2,18 +2,15 @@
 // SCRIPT PRINCIPAL - ENTRENA LIBRE
 // ==========================================
 
-// 1. IMPORTACIONES DE MÓDULOS
 import { supabase } from './js/superbase.js';
 import { verificarSesion, renderizarPanelUsuario } from './js/auth.js';
 import { cargarFavoritosNube, borrarRutinaNube } from './js/favoritos.js';
 import { ejercicios, actualizarPanelInformativo, generarPlanSemanal, cargarPlanSemanalGuardado } from './js/rutinas.js';
 
-// 2. INICIALIZACIÓN GENERAL AL CARGAR EL DOM
 document.addEventListener('DOMContentLoaded', () => {
     verificarSesion();
     cargarPlanSemanalGuardado();
 
-    // --- LÓGICA DEL MODO OSCURO ---
     const btnModoOscuro = document.getElementById('btn-modo-oscuro');
 
     if (localStorage.getItem('theme') === 'dark') {
@@ -29,24 +26,20 @@ document.addEventListener('DOMContentLoaded', () => {
         btnModoOscuro.textContent = isDark ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
     });
 
-    // --- SINCRONIZACIÓN DE SESIÓN ---
     document.addEventListener('sesionIniciada', () => {
         cargarFavoritosNube();
         actualizarPanelInformativo();
     });
 
-    // --- GESTIÓN CENTRALIZADA DE CLICS (Event Delegation) ---
     document.addEventListener('click', async (e) => {
         const targetId = e.target?.id;
         const targetClass = e.target?.classList;
 
-        // Cerrar Sesión
         if (targetId === 'btn-logout') {
             await supabase.auth.signOut();
             location.reload(); 
         }
 
-        // Iniciar Sesión con Correo
         if (targetId === 'btn-login') {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
@@ -60,7 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Registro de Usuario
         if (targetId === 'btn-signup') {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
@@ -72,15 +64,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('¡Registro exitoso! Ya podés iniciar sesión.');
             }
         }
-await supabase.auth.signInWithOAuth({
-  provider: 'google',
-  options: {
-    redirectTo: `${window.location.origin}/entrena-libre/`
-  }
-});
-    if (error) alert('Error al iniciar con Google: ' + error.message);
-}
-        // Guardar Perfil Físico
+
+        if (targetId === 'btn-google-login') {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google'
+            });
+            if (error) alert('Error al iniciar con Google: ' + error.message);
+        }
+
         if (targetId === 'btn-guardar-perfil') {
             const perfil = {
                 nombre: document.getElementById('perfil-nombre')?.value || '',
@@ -96,7 +87,6 @@ await supabase.auth.signInWithOAuth({
             if (session) renderizarPanelUsuario(session.user.email);
         }
 
-        // Borrar Historial
         if (targetId === 'btn-borrar-historial') {
             localStorage.removeItem('historialEntrenamientos');
             localStorage.setItem('totalRutinasGeneradas', '0');
@@ -104,18 +94,15 @@ await supabase.auth.signInWithOAuth({
             actualizarPanelInformativo();
         }
 
-        // Generar Plan Semanal
         if (targetId === 'btn-generar-plan') {
             generarPlanSemanal();
         }
 
-        // Borrar Rutina de la Nube
         if (targetClass?.contains('btn-borrar-nube')) {
             const idRutina = e.target.getAttribute('data-id');
             await borrarRutinaNube(idRutina);
         }
 
-        // Marcar Rutina como Completada
         if (targetId === 'btn-completar-rutina') {
             let completadas = parseInt(localStorage.getItem('rutinasCompletadas') || 0) + 1;
             localStorage.setItem('rutinasCompletadas', completadas);
@@ -128,7 +115,6 @@ await supabase.auth.signInWithOAuth({
     });
 });
 
-// 3. LÓGICA DEL GENERADOR DE RUTINAS
 document.getElementById('btn-generar')?.addEventListener('click', () => {
     const nivelSeleccionado = document.getElementById('nivel').value;
     const zonaSeleccionada = document.getElementById('zona').value;
