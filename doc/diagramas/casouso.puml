@@ -1,0 +1,15 @@
+
+@startuml
+left to right direction
+actor "Usuario" as User
+
+rectangle "Entrena Libre" {
+    usecase "Buscar y Filtrar Rutinas" as UC1
+    usecase "Gestionar Favoritos" as UC4
+    usecase "Aporte Voluntario" as UC5
+}
+
+User --> UC1
+User --> UC4
+User --> UC5
+@enduml

@@ -1,0 +1,19 @@
+@startuml
+autonumber
+actor Usuario
+participant "Frontend" as FE
+participant "Supabase Auth" as SB
+participant "Google OAuth" as GO
+participant "Base de Datos" as DB
+
+Usuario -> FE: Clic en "Iniciar sesión con Google"
+FE -> SB: supabase.auth.signInWithOAuth()
+SB -> GO: Redirige a pasarela de Google
+GO --> Usuario: Solicita credenciales
+Usuario --> GO: Autoriza acceso
+GO --> SB: Retorna token y perfil
+SB -> DB: Verifica o registra usuario
+DB --> SB: Confirma datos
+SB --> FE: Establece sesión activa
+FE --> Usuario: Muestra perfil autenticado
+@enduml

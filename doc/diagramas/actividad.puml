@@ -1,0 +1,18 @@
+@startuml
+start
+:Usuario ingresa a la aplicación;
+:Visualiza la pantalla principal;
+
+if (¿Qué acción desea realizar?) then (Buscar rutina)
+    :Ingresa filtros (zona muscular u objetivo);
+    :El sistema procesa y muestra resultados;
+    :El usuario selecciona una rutina;
+    :Visualiza el detalle y los ejercicios;
+else (Gestionar favoritos)
+    :Accede a su lista de favoritos;
+    :Selecciona una rutina para agregar o quitar;
+    :El sistema actualiza el estado;
+endif
+
+stop
+@enduml

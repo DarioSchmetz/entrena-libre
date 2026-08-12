@@ -1,0 +1,36 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class Usuario {
+    + String id
+    + String email
+    + String nombre
+    + login()
+    + logout()
+}
+
+class Rutina {
+    + String id
+    + String titulo
+    + String zonaMuscular
+    + String objetivo
+    + obtenerDetalle()
+}
+
+class Ejercicio {
+    + String id
+    + String nombre
+    + String series
+    + String repeticiones
+}
+
+class Favorito {
+    + String id
+    + agregar()
+    + eliminar()
+}
+
+Usuario "1" --> "*" Favorito : guarda
+Favorito "*" --> "1" Rutina : referencia
+Rutina "1" --> "*" Ejercicio : contiene
+@enduml
