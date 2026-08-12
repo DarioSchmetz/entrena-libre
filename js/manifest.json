@@ -1,0 +1,15 @@
+{
+  "name": "Entrena Libre",
+  "short_name": "EntrenaLibre",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3067/3067406.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
