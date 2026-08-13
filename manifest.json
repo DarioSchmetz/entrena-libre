@@ -1,13 +1,16 @@
 {
-  "name": "Entrena Libre",
-  "short_name": "EntrenaLibre",
-  "start_url": "./index.html",
+  "background_color": "#ffffff",
+  "dir": "ltr",
   "display": "standalone",
-  "background_color": "#121212",
-  "theme_color": "#000000",
+  "name": "Entrena Libre.",
+  "orientation": "any",
+  "scope": "/entrena-libre/",
+  "short_name": "EntrenaLibre",
+  "start_url": "/entrena-libre/index.html",
+  "theme_color": "#ffffff",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3067/3067406.png",
+      "src": "icono.png",
       "sizes": "512x512",
       "type": "image/png"
     }
