@@ -220,3 +220,36 @@ document.getElementById('btn-generar')?.addEventListener('click', () => {
         }
     });
 });
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Previene que aparezca el banner automático predeterminado sola
+    e.preventDefault();
+    // Guarda el evento para usarlo después con tu botón
+    deferredPrompt = e;
+    
+    // Hace visible tu botón personalizado en la web
+    const btnInstalar = document.getElementById('btn-instalar');
+    if (btnInstalar) {
+        btnInstalar.style.display = 'block';
+        
+        btnInstalar.addEventListener('click', () => {
+            // Muestra el cuadro nativo del sistema
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('El usuario aceptó instalar la PWA');
+                }
+                deferredPrompt = null;
+            });
+        });
+    }
+});
+// --- REGISTRO DE SERVICE WORKER PARA PWA ---
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Service Worker registrado con éxito:', reg.scope))
+            .catch(err => console.log('Error al registrar el Service Worker:', err));
+    });
+}

@@ -6,11 +6,17 @@
     <title>Entrena Libre - Gimnasio en Casa sin Costo</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="manifest" href="manifest.json">
+    
 </head>
 <body>
-    <button class="btn" id="btn-modo-oscuro" 
-    style="position: fixed; top: 20px; right: 20px; z-index: 1000; padding: 8px 12px; font-size: 0.85rem;">
-        🌙 Modo Oscuro</button>
+    <!-- Contenedor superior para los botones flotantes -->
+    <div style="position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; gap: 8px;">
+        <!-- Botón para instalar la PWA (inicialmente oculto) -->
+        <button id="btn-instalar" style="display: none;" class="btn" style="padding: 8px 12px; font-size: 0.85rem;">📱 Instalar</button>
+        
+        <button class="btn" id="btn-modo-oscuro" style="padding: 8px 12px; font-size: 0.85rem;">
+            🌙 Modo Oscuro</button>
+    </div>
 
 <main>
     <!-- Sección de Autenticación / Login -->
@@ -111,8 +117,10 @@
    class="btn" 
    style="background-color: #009ee3; color: white; text-decoration: none; display: inline-block;">
     💚 Apoyar Entrena Libre
-</a>>
+</a>
 </div>
+
+</main>
 
 <!-- Carga del script principal como módulo de JavaScript -->
 <script type="module" src="./script.js"></script>
