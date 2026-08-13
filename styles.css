@@ -47,6 +47,19 @@ main {
 }
 
 /* ==========================================
+   CONTENEDOR SUPERIOR (BOTONES FLOTANTES)
+   ========================================== */
+.top-actions {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* ==========================================
    TARJETAS UNIFORMES
    ========================================== */
 .card {
@@ -88,6 +101,17 @@ main {
 
 .btn:active {
     transform: translateY(0);
+}
+
+/* Estilo específico para el botón de instalación PWA */
+.btn-instalar {
+    background-color: #2e7d32;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+}
+
+.btn-instalar:hover {
+    background-color: #1b5e20;
 }
 
 /* ==========================================
@@ -201,4 +225,17 @@ footer {
         flex-direction: column;
         align-items: stretch;
     }
+}
+/* ==========================================
+   ESTILO PARA EL BOTÓN DE DESCARGA APK
+   ========================================== */
+.btn-apk {
+    background-color: #333;
+    color: white;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-apk:hover {
+    background-color: #444;
 }

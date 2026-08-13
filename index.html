@@ -6,19 +6,29 @@
     <title>Entrena Libre - Gimnasio en Casa sin Costo</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="manifest" href="manifest.json">
-    
 </head>
 <body>
     <!-- Contenedor superior para los botones flotantes -->
-    <div style="position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; gap: 8px;">
+    <div style="position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; gap: 8px; align-items: center;">
         <!-- Botón para instalar la PWA (inicialmente oculto) -->
-        <button id="btn-instalar" style="display: none;" class="btn" style="padding: 8px 12px; font-size: 0.85rem;">📱 Instalar</button>
+        <button id="btn-instalar" style="display: none;" class="btn btn-instalar">📱 Instalar</button>
         
         <button class="btn" id="btn-modo-oscuro" style="padding: 8px 12px; font-size: 0.85rem;">
             🌙 Modo Oscuro</button>
     </div>
 
 <main>
+   <!-- Botón para descargar el APK directamente -->
+<div class="card" style="text-align: center;">
+    <h3>📲 ¿Preferís la aplicación clásica?</h3>
+    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+        Descargá el archivo APK oficial para instalarlo directamente en tu dispositivo Android.
+    </p>
+    <a href="EntrenaLibre - Google Play package/EntrenaLibre.apk" download class="btn btn-apk">
+        📥 Descargar APK (Android)
+    </a>
+</div>
+
     <!-- Sección de Autenticación / Login -->
     <section class="card auth-section" id="seccion-auth">
         <div id="form-auth-container">

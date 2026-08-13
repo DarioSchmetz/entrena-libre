@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.darioschmetz.twa",
+        "sha256_cert_fingerprints": ["D5:33:2D:DA:61:E6:FF:B3:E8:F1:F9:D2:1D:AD:40:4C:9E:D8:65:E5:F6:45:12:F1:E6:29:F6:C6:FD:92:26:01"]
+      }
+    }]
