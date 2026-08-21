@@ -53,6 +53,33 @@ document.addEventListener('DOMContentLoaded', () => {
             location.reload(); 
         }
 
+        // Iniciar Sesión con Correo
+        if (targetId === 'btn-login') {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            
+            if (error) {
+                alert('Error al iniciar sesión: ' + error.message);
+            } else {
+                await verificarSesion();
+                cargarFavoritosNube();
+            }
+        }
+
+        // Registro de Usuario
+        if (targetId === 'btn-signup') {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const { error } = await supabase.auth.signUp({ email, password });
+            
+            if (error) {
+                alert('Error al registrarse: ' + error.message);
+            } else {
+                alert('¡Registro exitoso! Ya podés iniciar sesión.');
+            }
+        }
+
         // Inicio de Sesión con Google (Independiente y con ruta segura)
         if (targetId === 'btn-google-login') {
             const { error } = await supabase.auth.signInWithOAuth({
@@ -193,18 +220,21 @@ document.getElementById('btn-generar')?.addEventListener('click', () => {
         }
     });
 });
-
 let deferredPrompt;
 
 window.addEventListener('beforeinstallprompt', (e) => {
+    // Previene que aparezca el banner automático predeterminado sola
     e.preventDefault();
+    // Guarda el evento para usarlo después con tu botón
     deferredPrompt = e;
     
+    // Hace visible tu botón personalizado en la web
     const btnInstalar = document.getElementById('btn-instalar');
     if (btnInstalar) {
         btnInstalar.style.display = 'block';
         
         btnInstalar.addEventListener('click', () => {
+            // Muestra el cuadro nativo del sistema
             deferredPrompt.prompt();
             deferredPrompt.userChoice.then((choiceResult) => {
                 if (choiceResult.outcome === 'accepted') {
@@ -215,7 +245,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
         });
     }
 });
-
 // --- REGISTRO DE SERVICE WORKER PARA PWA ---
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {

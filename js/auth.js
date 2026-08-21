@@ -1,9 +1,9 @@
 import { supabase } from './superbase.js';
-
 export async function verificarSesion() {
     const { data: { session } } = await supabase.auth.getSession();
     actualizarVistaAuth(session);
     if (session) {
+        // Importaríamos dinámicamente o llamaríamos a favoritos
         document.dispatchEvent(new CustomEvent('sesionIniciada', { detail: session }));
     }
 }
@@ -20,11 +20,23 @@ export function actualizarVistaAuth(session) {
         if (formAuth) {
             formAuth.innerHTML = `
                 <div id="form-auth-container">
-                    <h3 class="auth-title" style="color: var(--primary-color); margin-bottom: 0.8rem;">👤 Mi Cuenta - Entrena Libre</h3>
-                    <p class="auth-subtitle" style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">Iniciá sesión de forma rápida y segura con tu cuenta de Google.</p>
-                    
-                    <div class="auth-form-group" style="max-width: 300px; margin: 0 auto;">
-                        <button class="btn btn-social btn-google" id="btn-google-login" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <h3 style="color: var(--primary-color); margin-bottom: 0.8rem;">💪 Entrena Libre</h3>
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">Iniciá sesión o registrate para guardar tu progreso y rutinas.</p>
+                    <div style="display: flex; flex-direction: column; gap: 10px; max-width: 300px; margin: 0 auto;">
+                        <input type="email" id="auth-email" placeholder="Correo electrónico" class="form-input">
+                        <input type="password" id="auth-password" placeholder="Contraseña" class="form-input">
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-login" id="btn-login">🔑 Ingresar</button>
+                            <button class="btn btn-signup" id="btn-signup">📝 Registrarse</button>
+                        </div>
+                        
+                        <div class="auth-divider">
+                            <hr class="divider-line">
+                            <span class="divider-text">o con redes</span>
+                            <hr class="divider-line">
+                        </div>
+
+                        <button class="btn btn-social" id="btn-google-login">
                             <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.19v3.15C3.17 21.36 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.19C.43 8.13 0 9.87 0 11.7s.43 3.57 1.19 5.1l4.08-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.17 2.64 1.19 6.6l4.08 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
                             Continuar con Google
                         </button>
